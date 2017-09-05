@@ -1,11 +1,13 @@
 package com.example.shobhitsagar.collage;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
@@ -32,10 +34,14 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_OPEN_RESULT_CODE = 0;
     private static final int REQUEST_OPEN_RESULT_CODE2 = 1;
 
+    private ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        progressDialog = new ProgressDialog(this);
 
         ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
 
@@ -45,6 +51,10 @@ public class MainActivity extends AppCompatActivity {
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                progressDialog.setMessage("Saving...");
+                progressDialog.show();
+
                 View content = findViewById(R.id.relativeLayout);
                 Bitmap bitmap = getScreenShot(content);
                 currentImage = "image" + System.currentTimeMillis() + ".png";
@@ -119,6 +129,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void store(Bitmap bitmap, String fileName) {
+
+        progressDialog.setTitle("Save");
+        progressDialog.setMessage("Saving...");
+        progressDialog.show();
+
         String dirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/COLLAGE";
         File dir = new File(dirPath);
         if (!dir.exists()) {
@@ -130,7 +145,15 @@ public class MainActivity extends AppCompatActivity {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
             fileOutputStream.flush();
             fileOutputStream.close();
-            Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show();
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    progressDialog.dismiss();
+                    Toast.makeText(MainActivity.this, "Saved!", Toast.LENGTH_SHORT).show();
+                }
+            }, 1000);
         } catch (IOException e) {
             e.printStackTrace();
         }
