@@ -165,6 +165,7 @@ public class MainActivity extends AppCompatActivity {
         final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Exit");
         builder.setMessage("Are you sure you want to exit?");
+        builder.setIcon(R.drawable.ic_help_outline_black_24dp);
         builder.setCancelable(true);
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
